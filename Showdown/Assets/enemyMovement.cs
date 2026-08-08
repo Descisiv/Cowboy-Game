@@ -4,67 +4,112 @@ using UnityEngine;
 
 public class enemyMovement : MonoBehaviour
 {
+    Animator Anim;
+    public float Health;
     public float DesiredDistance;
     public int myTurn;
     public int TilePos;
     public TurnManager TurnManager;
     int distance;
     int dir;
+    bool charged;
+    bool dead;
+    bool readied;
+    bool Attacking;
     // Start is called before the first frame update
     void Start()
     {
         TurnManager.entities++;
+        Anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (TurnManager.turn == myTurn)
+        if(Health <= 0 && !dead)
+        {
+            Die();
+        }
+
+        if (TurnManager.turn == myTurn && !Attacking)
         {
             distance = TurnManager.PlayerPos - TilePos;
             dir = (int)transform.localScale.x;
-
-            if(distance > 0)
+            if (dead)
             {
-                if(dir > 0)
+                Wait();
+            }
+            else if (charged)
+            {
+                if (readied)
                 {
-                    if(distance == DesiredDistance)
+                    Attack();
+                }
+                else if (distance > 0)
+                {
+                    if (dir > 0)
                     {
-                        //switch to attack when implemented
-                        Wait();
+                        if (distance == DesiredDistance)
+                        {
+                            //switch to attack when implemented
+                            Ready();
+                        }
+                        else
+                        {
+                            MoveRight();
+                        }
                     }
                     else
                     {
-                        MoveRight();
+                        Flip();
                     }
                 }
                 else
                 {
-                    Flip();
+                    if (dir > 0)
+                    {
+                        Flip();
+                    }
+                    else
+                    {
+                        if (distance == DesiredDistance * -1)
+                        {
+                            //swap with attack when possible
+                            Ready();
+                        }
+                        else
+                        {
+                            MoveLeft();
+                        }
+                    }
                 }
             }
             else
             {
-                if (dir > 0)
-                {
-                    Flip();
-                }
-                else
-                {
-                    if (distance == DesiredDistance * -1)
-                    {
-                        //swap with attack when possible
-                        Wait();
-                    }
-                    else
-                    {
-                        MoveLeft();
-                    }
-                }
+                Wait();
             }
         }
     }
 
+    void Attack()
+    {
+        Attacking = true;
+        Anim.SetInteger("state", 2);
+        readied = false;
+        StartCoroutine(AttackTimer());
+    }
+    void Ready()
+    {
+        Anim.SetInteger("state", 1);
+        readied = true;
+        TurnManager.NextTurn();
+    }
+    void Die()
+    {
+        TurnManager.occupied[TilePos + TurnManager.radius] = false;
+        transform.position += Vector3.down * 10;
+        dead = true;
+    }
     void MoveRight()
     {
         TurnManager.occupied[TilePos + TurnManager.radius] = false;
@@ -84,6 +129,7 @@ public class enemyMovement : MonoBehaviour
 
     void Flip()
     {
+        charged = false;
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
         TurnManager.NextTurn();
     }
@@ -91,6 +137,16 @@ public class enemyMovement : MonoBehaviour
     void Wait()
     {
         TurnManager.NextTurn();
+        charged = true;
+    }
+
+    IEnumerator AttackTimer()
+    {
+        yield return new WaitForSeconds(.5f);
+        TurnManager.NextTurn();
+        Anim.SetInteger("state", 0);
+        Attacking = false;
+        charged = false;
     }
 
 }

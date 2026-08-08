@@ -14,6 +14,7 @@ public class player : MonoBehaviour
     bool moving;
     int dir;
     float i;
+    public float RevolverDamage;
     public int TilePos;
     public float movingTime;
     public float flippingTime;
@@ -104,6 +105,13 @@ public class player : MonoBehaviour
         lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point};
         StartCoroutine(DestroyBullet());
         lrController.lr.enabled = true;
+        GameObject enemy = GunRay.collider.gameObject;
+
+        if(enemy.layer == 7)
+        {
+            enemyMovement EnemyScript = enemy.GetComponent<enemyMovement>();
+            EnemyScript.Health -= RevolverDamage;
+        }
     }
 
     IEnumerator DestroyBullet()
