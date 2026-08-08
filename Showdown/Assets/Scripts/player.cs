@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class player : MonoBehaviour
 {
+    public BulletUI bulletUI;
     Vector3 OnFlipStartScale;
 
     public LineController lrController;
@@ -12,6 +13,7 @@ public class player : MonoBehaviour
     public string state = "static";
     public Animator anim;
     bool moving;
+    public bool loading;
     int dir;
     float i;
     public float RevolverDamage;
@@ -23,6 +25,9 @@ public class player : MonoBehaviour
     public float shootingTime;
     public float TimeTillBullet;
     public int bullets;
+    //0 = normal, 1 = piercing, 2 = poison, 3 = fire, 4 = vamp
+    public int bulletTypeCurrent;
+    public int[] bulletTypes;
     public float bulletLifeSpan;
     public Vector3 offset;
     public LayerMask GunMask;
@@ -106,6 +111,8 @@ public class player : MonoBehaviour
 
     private void Shoot()
     {
+        lrController.lr.startColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
+        lrController.lr.endColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
         bullets--;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
         lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0)};
@@ -144,13 +151,16 @@ public class player : MonoBehaviour
 
     IEnumerator LoadTimer()
     {
+        loading = true;
         yield return new WaitForSeconds(loadingTime);
         if (bullets < 6)
         {
+            bulletTypes[bullets] = bulletTypeCurrent;
             bullets++;
         }
         state = "static";
         TurnManager.NextTurn();
+        loading = false;
     }
     IEnumerator MoveTimer()
     {
