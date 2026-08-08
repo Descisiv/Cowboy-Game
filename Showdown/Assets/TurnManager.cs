@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TurnManager : MonoBehaviour
 {
+    public bool[] occupied;
     public int radius;
     public player player;
     public int entities = 1;

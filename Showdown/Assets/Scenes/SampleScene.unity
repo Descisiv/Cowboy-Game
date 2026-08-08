@@ -912,6 +912,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0415f75e5d03d904888429442fd207ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  occupied: 000000000100010000
   radius: 4
   player: {fileID: 672391393}
   entities: 1

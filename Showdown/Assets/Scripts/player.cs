@@ -39,11 +39,16 @@ public class player : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A))
             {
-                state = "moving";
-                dir = (int)Input.GetAxisRaw("Horizontal");
-                moving = true;
-                StartCoroutine(MoveTimer());
-                TilePos = dir > 0 ? TilePos + 1 : TilePos - 1;
+                if (!TurnManager.occupied[TilePos + TurnManager.radius + (int)Input.GetAxisRaw("Horizontal")])
+                {
+                    TurnManager.occupied[TilePos + TurnManager.radius] = false;
+                    TurnManager.occupied[TilePos + TurnManager.radius + (int)Input.GetAxisRaw("Horizontal")] = true;
+                    state = "moving";
+                    dir = (int)Input.GetAxisRaw("Horizontal");
+                    moving = true;
+                    StartCoroutine(MoveTimer());
+                    TilePos = dir > 0 ? TilePos + 1 : TilePos - 1;
+                }
             }
 
             if (Input.GetKeyDown(KeyCode.W))
@@ -96,9 +101,9 @@ public class player : MonoBehaviour
     {
         bullets--;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
-        lrController.lr.enabled = true;
         lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point};
         StartCoroutine(DestroyBullet());
+        lrController.lr.enabled = true;
     }
 
     IEnumerator DestroyBullet()

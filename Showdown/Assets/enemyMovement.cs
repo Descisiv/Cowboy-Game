@@ -67,12 +67,16 @@ public class enemyMovement : MonoBehaviour
 
     void MoveRight()
     {
+        TurnManager.occupied[TilePos + TurnManager.radius] = false;
+        TurnManager.occupied[TilePos + TurnManager.radius + 1] = true;
         TilePos++;
         transform.position += Vector3.right;
         TurnManager.NextTurn();
     }
     void MoveLeft()
     {
+        TurnManager.occupied[TilePos + TurnManager.radius] = false;
+        TurnManager.occupied[TilePos + TurnManager.radius - 1] = true;
         TilePos--;
         transform.position += Vector3.left;
         TurnManager.NextTurn();
