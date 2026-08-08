@@ -7,14 +7,14 @@ public class player : MonoBehaviour
     Vector3 OnFlipStartScale;
 
     public LineController lrController;
+    public TurnManager TurnManager;
 
     public string state = "static";
     public Animator anim;
-    bool playerTurn = true;
     bool moving;
     int dir;
     float i;
-    int TilePos;
+    public int TilePos;
     public float movingTime;
     public float flippingTime;
     public float speed;
@@ -33,9 +33,9 @@ public class player : MonoBehaviour
         //for debugging to automatically return turn to player
         if (Input.GetKeyDown(KeyCode.X))
         {
-            playerTurn = true;
+            TurnManager.turn = 0;
         }
-        if (playerTurn && !moving && state == "static")
+        if (TurnManager.turn == 0 && !moving && state == "static")
         {
             if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A))
             {
@@ -118,8 +118,8 @@ public class player : MonoBehaviour
         }
         else
         {
+            TurnManager.NextTurn();
             state = "static";
-            playerTurn = false;
         }
     }
 
@@ -131,7 +131,7 @@ public class player : MonoBehaviour
             bullets++;
         }
         state = "static";
-        playerTurn = false;
+        TurnManager.NextTurn();
     }
     IEnumerator MoveTimer()
     {
@@ -139,15 +139,15 @@ public class player : MonoBehaviour
         yield return new WaitForSeconds(movingTime);
         moving = false;
         transform.position = StartPos + Vector3.right * speed * dir * movingTime;
-        playerTurn = false;
         state = "static";
+        TurnManager.NextTurn();
     }
     IEnumerator FlipTimer()
     {
         Vector3 StartScale = transform.localScale;
         yield return new WaitForSeconds(flippingTime);
         transform.localScale = new Vector3(StartScale.x * -1, StartScale.y, StartScale.z);
-        playerTurn = false;
         state = "static";
+        TurnManager.NextTurn();
     }
 }
