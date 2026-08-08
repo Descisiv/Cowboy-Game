@@ -1,9 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
+    public float health;
+    public float maxHealth;
+    public GameObject PlayerObj;
+    public Slider HealthBar;
     public bool[] occupied;
     public int radius;
     public player player;
@@ -19,6 +24,7 @@ public class TurnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HealthBar.value = health / maxHealth;
         PlayerPos = player.TilePos;   
     }
 

@@ -9,6 +9,8 @@ public class enemyMovement : MonoBehaviour
     public float DesiredDistance;
     public int myTurn;
     public int TilePos;
+    public float damage;
+    public LayerMask attackLayer;
     public TurnManager TurnManager;
     int distance;
     int dir;
@@ -143,6 +145,11 @@ public class enemyMovement : MonoBehaviour
     IEnumerator AttackTimer()
     {
         yield return new WaitForSeconds(.5f);
+        RaycastHit2D AttackRay = Physics2D.Raycast(transform.position, Vector3.right * transform.lossyScale.x, 1, attackLayer);
+        if(AttackRay.collider != null)
+        {
+            TurnManager.health -= damage;
+        }
         TurnManager.NextTurn();
         Anim.SetInteger("state", 0);
         Attacking = false;

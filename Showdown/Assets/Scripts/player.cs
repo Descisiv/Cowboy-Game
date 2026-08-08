@@ -36,6 +36,12 @@ public class player : MonoBehaviour
         {
             TurnManager.turn = 0;
         }
+
+        if(TurnManager.health <= 0)
+        {
+            Destroy(gameObject);
+        }
+
         if (TurnManager.turn == 0 && !moving && state == "static")
         {
             if (Input.GetKeyDown(KeyCode.D) || Input.GetKeyDown(KeyCode.A))
