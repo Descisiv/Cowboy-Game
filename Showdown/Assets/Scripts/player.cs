@@ -108,7 +108,7 @@ public class player : MonoBehaviour
     {
         bullets--;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
-        lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point};
+        lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0)};
         StartCoroutine(DestroyBullet());
         lrController.lr.enabled = true;
         GameObject enemy = GunRay.collider.gameObject;
