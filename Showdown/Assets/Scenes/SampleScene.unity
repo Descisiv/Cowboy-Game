@@ -913,7 +913,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0415f75e5d03d904888429442fd207ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  occupied: 010000000100010000
+  occupied: 000100000100010000
   radius: 4
   player: {fileID: 672391393}
   entities: 1
@@ -989,7 +989,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Health: 10
   DesiredDistance: 1
-  myTurn: 1
+  myTurn: 2
   TilePos: -3
   TurnManager: {fileID: 1255437019}
 --- !u!61 &1369916600
