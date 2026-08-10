@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class enemyMovement : MonoBehaviour
 {
+    public int entitiesLastFrame = 1;
     Animator Anim;
     public float Health;
     public float DesiredDistance;
@@ -19,18 +20,32 @@ public class enemyMovement : MonoBehaviour
     bool readied;
     bool Attacking;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        TurnManager.entities++;
-        Anim = GetComponent<Animator>();
+        
+        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(Health <= 0 && !dead)
+        Anim = GetComponent<Animator>();
+        TurnManager = GetComponentInParent<TurnManager>();
+
+        if (TurnManager.needUpdateTurns)
+        {
+            myTurn--;
+        }
+
+        if (Health <= 0 && !dead)
         {
             Die();
+        }
+
+        if(TurnManager.entities < entitiesLastFrame)
+        {
+            myTurn--;
         }
 
         if (TurnManager.turn == myTurn && !Attacking)
@@ -111,6 +126,10 @@ public class enemyMovement : MonoBehaviour
         TurnManager.occupied[TilePos + TurnManager.radius] = false;
         transform.position += Vector3.down * 10;
         dead = true;
+        TurnManager.entities--;
+        TurnManager.deadEnemies++;
+        TurnManager.needUpdateTurns = true;
+        Destroy(gameObject);
     }
     void MoveRight()
     {

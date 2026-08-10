@@ -7,6 +7,7 @@ public class player : MonoBehaviour
     public BulletUI bulletUI;
     Vector3 OnFlipStartScale;
 
+    public bool canGoToNextWave;
     public LineController lrController;
     public TurnManager TurnManager;
 
@@ -135,6 +136,7 @@ public class player : MonoBehaviour
 
     IEnumerator ShootTimer()
     {
+        canGoToNextWave = false;
         yield return new WaitForSeconds(TimeTillBullet);
         Shoot();
         yield return new WaitForSeconds(shootingTime - TimeTillBullet);
@@ -147,10 +149,12 @@ public class player : MonoBehaviour
             TurnManager.NextTurn();
             state = "static";
         }
+        canGoToNextWave = true;
     }
 
     IEnumerator LoadTimer()
     {
+        canGoToNextWave = false;
         loading = true;
         yield return new WaitForSeconds(loadingTime);
         if (bullets < 6)
@@ -161,22 +165,27 @@ public class player : MonoBehaviour
         state = "static";
         TurnManager.NextTurn();
         loading = false;
+        canGoToNextWave = true;
     }
     IEnumerator MoveTimer()
     {
+        canGoToNextWave = false;
         Vector3 StartPos = transform.position;
         yield return new WaitForSeconds(movingTime);
         moving = false;
         transform.position = StartPos + Vector3.right * speed * dir * movingTime;
         state = "static";
         TurnManager.NextTurn();
+        canGoToNextWave = true;
     }
     IEnumerator FlipTimer()
     {
+        canGoToNextWave = false;
         Vector3 StartScale = transform.localScale;
         yield return new WaitForSeconds(flippingTime);
         transform.localScale = new Vector3(StartScale.x * -1, StartScale.y, StartScale.z);
         state = "static";
         TurnManager.NextTurn();
+        canGoToNextWave = true;
     }
 }
