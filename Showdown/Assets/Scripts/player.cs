@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class player : MonoBehaviour
@@ -115,16 +116,35 @@ public class player : MonoBehaviour
         lrController.lr.startColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
         lrController.lr.endColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
         bullets--;
+        switch (bulletTypes[bullets]) {
+            case 0:
+                RevolverDamage = 5;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
-        lrController.points = new Vector3[] {transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0)};
+        lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
         StartCoroutine(DestroyBullet());
         lrController.lr.enabled = true;
         GameObject enemy = GunRay.collider.gameObject;
 
-        if(enemy.layer == 7)
+        if (enemy.layer == 7)
         {
             enemyMovement EnemyScript = enemy.GetComponent<enemyMovement>();
             EnemyScript.Health -= RevolverDamage;
+        }
+                break;
+            case 1:
+                RevolverDamage = 4;
+                RaycastHit2D[] PierceRay = Physics2D.RaycastAll(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
+                lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), PierceRay[0].point + new Vector2(transform.lossyScale.x * 10, 0) };
+                StartCoroutine(DestroyBullet());
+                lrController.lr.enabled = true;
+                for (int i = 0; i < PierceRay.Length; i++)
+                {
+                    if (PierceRay[i].collider.gameObject.layer == 7)
+                    {
+                        PierceRay[i].collider.gameObject.GetComponent<enemyMovement>().Health -= RevolverDamage;
+                    }
+                }
+                break;
         }
     }
 

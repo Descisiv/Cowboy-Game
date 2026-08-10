@@ -1,11 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class enemyMovement : MonoBehaviour
 {
+    bool registered;
+    Vector3 HealthBarScale;
+    public Slider HealthBar;
+    public GameObject SliderObject;
     public int entitiesLastFrame = 1;
     Animator Anim;
+    public float maxHealth;
     public float Health;
     public float DesiredDistance;
     public int myTurn;
@@ -30,8 +36,15 @@ public class enemyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HealthBar.value = Health / maxHealth;
         Anim = GetComponent<Animator>();
         TurnManager = GetComponentInParent<TurnManager>();
+
+        if (!registered)
+        {
+            HealthBarScale = SliderObject.transform.localScale;
+            registered = true;
+        }
 
         if (TurnManager.needUpdateTurns)
         {
@@ -71,9 +84,13 @@ public class enemyMovement : MonoBehaviour
                             //switch to attack when implemented
                             Ready();
                         }
-                        else
+                        else if (!TurnManager.occupied[TilePos + TurnManager.radius + 1])
                         {
                             MoveRight();
+                        }
+                        else
+                        {
+                            Wait();
                         }
                     }
                     else
@@ -94,9 +111,13 @@ public class enemyMovement : MonoBehaviour
                             //swap with attack when possible
                             Ready();
                         }
-                        else
+                        else if (!TurnManager.occupied[TilePos + TurnManager.radius - 1])
                         {
                             MoveLeft();
+                        }
+                        else
+                        {
+                            Wait();
                         }
                     }
                 }
@@ -150,8 +171,17 @@ public class enemyMovement : MonoBehaviour
 
     void Flip()
     {
+        
         charged = false;
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+        if(transform.localScale.x > 0)
+        {
+            SliderObject.transform.localScale = HealthBarScale;
+        }
+        else
+        {
+            SliderObject.transform.localScale = new Vector3(HealthBarScale.x * -1, HealthBarScale.y, HealthBarScale.z);
+        }
         TurnManager.NextTurn();
     }
 
