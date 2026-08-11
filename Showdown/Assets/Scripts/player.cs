@@ -187,6 +187,37 @@ public class player : MonoBehaviour
                     TurnManager.TurnsLeftOnFire[EnemyScript.TilePos + TurnManager.radius] = 7;
                 }
                 break;
+            case 4:
+                RevolverDamage = 4;
+                RaycastHit2D VampRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
+                lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), VampRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
+                StartCoroutine(DestroyBullet());
+                lrController.lr.enabled = true;
+                GameObject enemyV = VampRay.collider.gameObject;
+
+                if (enemyV.layer == 7)
+                {
+                    enemyMovement EnemyScript = enemyV.GetComponent<enemyMovement>();
+                    EnemyScript.Health -= RevolverDamage;
+                    TurnManager.health += 5;
+                    TurnManager.health = Mathf.Clamp(TurnManager.health, 0, TurnManager.maxHealth);
+                }
+                break;
+            case 5:
+                RevolverDamage = 10;
+                RaycastHit2D FlipRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
+                lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), FlipRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
+                StartCoroutine(DestroyBullet());
+                lrController.lr.enabled = true;
+                GameObject enemyFl = FlipRay.collider.gameObject;
+
+                if (enemyFl.layer == 7)
+                {
+                    enemyMovement EnemyScript = enemyFl.GetComponent<enemyMovement>();
+                    EnemyScript.Health -= RevolverDamage;
+                }
+                transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
+                break;
         }
     }
 
