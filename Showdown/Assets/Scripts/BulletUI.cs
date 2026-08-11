@@ -11,6 +11,7 @@ public class BulletUI : MonoBehaviour
     public Image[] slots;
     public Sprite[] BulletTypes;
     public player Player;
+    public List<int> loadedBullets;
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +21,14 @@ public class BulletUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        loadedBullets = new List<int> { };
+        for (int i = 0; i < Player.bulletTypes.Length; i++)
+        {
+            if (Player.bulletTypes[i] != -1)
+            {
+                loadedBullets.Add(Player.bulletTypes[i]);
+            }
+        }
         DisplayBullet.sprite = BulletTypes[Player.bulletTypeCurrent];
 
         for(int i = 0; i < fills.Length; i++)
@@ -31,7 +40,7 @@ public class BulletUI : MonoBehaviour
             if (Player.bullets > j)
             {
                 fills[j].enabled = true;
-                fills[j].color = bulletTypeColors[Player.bulletTypes[j]];
+                fills[j].color = bulletTypeColors[loadedBullets[j]];
             } 
         }
     }

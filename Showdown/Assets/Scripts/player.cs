@@ -124,10 +124,25 @@ public class player : MonoBehaviour
 
     private void Shoot()
     {
-        lrController.lr.startColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
-        lrController.lr.endColor = bulletUI.bulletTypeColors[bulletTypes[bullets - 1]];
         bullets--;
-        switch (bulletTypes[bullets]) {
+        
+        
+        List<int> loadedBullets = new List<int>{};
+        for(int i = 0; i < bulletTypes.Length; i++)
+        {
+            if (bulletTypes[i] != -1)
+            {
+                loadedBullets.Add(bulletTypes[i]);
+            }
+        }
+        for(int j = 1; j < loadedBullets.Count; j++)
+        {
+            bulletTypes[j - 1] = bulletTypes[j];
+        }
+        bulletTypes[bulletTypes.Length - 1] = -1;
+        lrController.lr.startColor = bulletUI.bulletTypeColors[loadedBullets[0]];
+        lrController.lr.endColor = bulletUI.bulletTypeColors[loadedBullets[0]];
+        switch (loadedBullets[0]) {
             case 0:
                 RevolverDamage = 10;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
