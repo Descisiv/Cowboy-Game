@@ -8,6 +8,7 @@ public class player : MonoBehaviour
     public BulletUI bulletUI;
     Vector3 OnFlipStartScale;
 
+    public bool HasTakenFireDamageThisTurn;
     public bool canGoToNextWave;
     public LineController lrController;
     public TurnManager TurnManager;
@@ -44,6 +45,12 @@ public class player : MonoBehaviour
             TurnManager.turn = 0;
         }
 
+        if(!HasTakenFireDamageThisTurn && TurnManager.onFire[TilePos + TurnManager.radius])
+        {
+            HasTakenFireDamageThisTurn = true;
+            TurnManager.health -= TurnManager.FireDamage;
+        }
+
         if(TurnManager.health <= 0)
         {
             Destroy(gameObject);
@@ -55,6 +62,7 @@ public class player : MonoBehaviour
             {
                 if (!TurnManager.occupied[TilePos + TurnManager.radius + (int)Input.GetAxisRaw("Horizontal")])
                 {
+                    HasTakenFireDamageThisTurn = false;
                     TurnManager.occupied[TilePos + TurnManager.radius] = false;
                     TurnManager.occupied[TilePos + TurnManager.radius + (int)Input.GetAxisRaw("Horizontal")] = true;
                     state = "moving";
@@ -67,6 +75,7 @@ public class player : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.W))
             {
+                HasTakenFireDamageThisTurn = false;
                 OnFlipStartScale = transform.localScale;
                 i = 0;
                 state = "flipping";
@@ -75,12 +84,14 @@ public class player : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.S))
             {
+                HasTakenFireDamageThisTurn = false;
                 state = "loading";
                 StartCoroutine(LoadTimer());
             }
 
             if (Input.GetKeyDown(KeyCode.Space) && bullets > 0)
             {
+                HasTakenFireDamageThisTurn = false;
                 state = "shooting";
                 StartCoroutine(ShootTimer());
             }
@@ -118,7 +129,7 @@ public class player : MonoBehaviour
         bullets--;
         switch (bulletTypes[bullets]) {
             case 0:
-                RevolverDamage = 5;
+                RevolverDamage = 10;
         RaycastHit2D GunRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
         lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), GunRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
         StartCoroutine(DestroyBullet());
@@ -132,7 +143,7 @@ public class player : MonoBehaviour
         }
                 break;
             case 1:
-                RevolverDamage = 4;
+                RevolverDamage = 8;
                 RaycastHit2D[] PierceRay = Physics2D.RaycastAll(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
                 lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), PierceRay[0].point + new Vector2(transform.lossyScale.x * 10, 0) };
                 StartCoroutine(DestroyBullet());
@@ -143,6 +154,37 @@ public class player : MonoBehaviour
                     {
                         PierceRay[i].collider.gameObject.GetComponent<enemyMovement>().Health -= RevolverDamage;
                     }
+                }
+                break;
+            case 2:
+                RevolverDamage = 6;
+                RaycastHit2D PoisonRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
+                lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), PoisonRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
+                StartCoroutine(DestroyBullet());
+                lrController.lr.enabled = true;
+                GameObject enemyP = PoisonRay.collider.gameObject;
+
+                if (enemyP.layer == 7)
+                {
+                    enemyMovement EnemyScript = enemyP.GetComponent<enemyMovement>();
+                    EnemyScript.poisonedTurnsRemaining += 4;
+                    EnemyScript.Health -= RevolverDamage;
+                }
+                break;
+            case 3:
+                RevolverDamage = 2;
+                RaycastHit2D FireRay = Physics2D.Raycast(transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), Vector3.right * transform.lossyScale.x, 10, GunMask);
+                lrController.points = new Vector3[] { transform.position + new Vector3(offset.x * transform.lossyScale.x, offset.y, offset.z), FireRay.point + new Vector2(transform.lossyScale.x * 0.25f, 0) };
+                StartCoroutine(DestroyBullet());
+                lrController.lr.enabled = true;
+                GameObject enemyF = FireRay.collider.gameObject;
+
+                if (enemyF.layer == 7)
+                {
+                    enemyMovement EnemyScript = enemyF.GetComponent<enemyMovement>();
+                    EnemyScript.Health -= RevolverDamage;
+                    TurnManager.onFire[EnemyScript.TilePos + TurnManager.radius] = true;
+                    TurnManager.TurnsLeftOnFire[EnemyScript.TilePos + TurnManager.radius] = 7;
                 }
                 break;
         }
@@ -167,6 +209,7 @@ public class player : MonoBehaviour
         else
         {
             TurnManager.NextTurn();
+            TurnManager.NewRound();
             state = "static";
         }
         canGoToNextWave = true;
@@ -184,6 +227,7 @@ public class player : MonoBehaviour
         }
         state = "static";
         TurnManager.NextTurn();
+        TurnManager.NewRound();
         loading = false;
         canGoToNextWave = true;
     }
@@ -196,6 +240,7 @@ public class player : MonoBehaviour
         transform.position = StartPos + Vector3.right * speed * dir * movingTime;
         state = "static";
         TurnManager.NextTurn();
+        TurnManager.NewRound();
         canGoToNextWave = true;
     }
     IEnumerator FlipTimer()
@@ -206,6 +251,7 @@ public class player : MonoBehaviour
         transform.localScale = new Vector3(StartScale.x * -1, StartScale.y, StartScale.z);
         state = "static";
         TurnManager.NextTurn();
+        TurnManager.NewRound();
         canGoToNextWave = true;
     }
 }

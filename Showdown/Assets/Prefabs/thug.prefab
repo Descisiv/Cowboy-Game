@@ -324,6 +324,7 @@ GameObject:
   - component: {fileID: 8365428028876786463}
   - component: {fileID: 461550278723565747}
   - component: {fileID: 3626272751121132156}
+  - component: {fileID: 4029906432639740058}
   m_Layer: 7
   m_Name: thug
   m_TagString: Untagged
@@ -456,11 +457,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5dbb5d1cf835bed47be4cb3382c86fe3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  poisonedColor: {r: 0.5529412, g: 1, b: 0.5529412, a: 1}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  render: {fileID: 697245346152627610}
+  poisonedTurnsRemaining: 0
   HealthBar: {fileID: 3565343667446750630}
   SliderObject: {fileID: 1726885322737750010}
   entitiesLastFrame: 1
-  maxHealth: 10
-  Health: 10
+  maxHealth: 20
+  Health: 20
   DesiredDistance: 1
   myTurn: 1
   TilePos: 2
@@ -490,6 +495,33 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!50 &4029906432639740058
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5541949353546276443}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 7
 --- !u!1 &5954675522962243126
 GameObject:
   m_ObjectHideFlags: 0

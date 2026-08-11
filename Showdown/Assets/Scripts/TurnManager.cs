@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 public class TurnManager : MonoBehaviour
 {
+    public GameObject[] FireTiles;
+    public float PoisonDamage;
+    public float FireDamage;
     public bool needUpdateTurns;
     GameObject newEnemy;
     int currentWave = -1;
@@ -16,12 +19,16 @@ public class TurnManager : MonoBehaviour
     public GameObject PlayerObj;
     public Slider HealthBar;
     public bool[] occupied;
+    public bool[] onFire;
+    public int[] TurnsLeftOnFire;
     public int radius;
     public player player;
     public int entities = 1;
     public int deadEnemies;
     public int turn = 0;
     public int PlayerPos;
+    public int rounds;
+    int roundsLastFrame;
     // Start is called before the first frame update
     void Start()
     {
@@ -31,6 +38,21 @@ public class TurnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+            for (int i = 0; i < onFire.Length; i++)
+            {
+                if (onFire[i])
+                {
+                    FireTiles[i].SetActive(true);
+                }
+                else
+                {
+                    FireTiles[i].SetActive(false);
+                }
+
+
+            }
+
         StartCoroutine(resetTurnUpdate());
         HealthBar.value = health / maxHealth;
         PlayerPos = player.TilePos;
@@ -53,6 +75,21 @@ public class TurnManager : MonoBehaviour
         needUpdateTurns = false;
     }
 
+    public void NewRound()
+    {
+        rounds++;
+        for(int i = 0; i < TurnsLeftOnFire.Length; i++)
+        {
+            if (TurnsLeftOnFire[i] > 0)
+            {
+                TurnsLeftOnFire[i]--;
+            }
+            else
+            {
+                onFire[i] = false;
+            }
+        }
+    }
     public void NextWave()
     {
         entities = 1;
@@ -93,5 +130,11 @@ public class TurnManager : MonoBehaviour
                 WavesInfo[currentWave] -= (int)Mathf.Pow(2, i);
             }
         }
+    }
+
+    IEnumerator resetRounds()
+    {
+        yield return new WaitForEndOfFrame();
+        roundsLastFrame = rounds;
     }
 }

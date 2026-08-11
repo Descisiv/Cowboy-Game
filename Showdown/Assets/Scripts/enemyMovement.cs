@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class enemyMovement : MonoBehaviour
 {
+    bool HasTakenFireDamageThisTurn;
+    public Color poisonedColor;
+    public Color normalColor;
+    public SpriteRenderer render;
+    public int poisonedTurnsRemaining;
     bool registered;
     Vector3 HealthBarScale;
     public Slider HealthBar;
@@ -36,9 +41,23 @@ public class enemyMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
+        if (poisonedTurnsRemaining > 0)
+        {
+            render.color = poisonedColor;
+        }
+        else
+        {
+            render.color = normalColor;
+        }
         HealthBar.value = Health / maxHealth;
         Anim = GetComponent<Animator>();
         TurnManager = GetComponentInParent<TurnManager>();
+        if (!HasTakenFireDamageThisTurn && TurnManager.onFire[TilePos + TurnManager.radius])
+        {
+            HasTakenFireDamageThisTurn = true;
+            Health -= TurnManager.FireDamage;
+        }
 
         if (!registered)
         {
@@ -129,8 +148,18 @@ public class enemyMovement : MonoBehaviour
         }
     }
 
+    void CheckPoison()
+    {
+        if(poisonedTurnsRemaining > 0)
+        {
+            Health -= TurnManager.PoisonDamage;
+            poisonedTurnsRemaining--;
+        }
+    }
     void Attack()
     {
+        CheckPoison();
+        HasTakenFireDamageThisTurn = false;
         Attacking = true;
         Anim.SetInteger("state", 2);
         readied = false;
@@ -138,6 +167,8 @@ public class enemyMovement : MonoBehaviour
     }
     void Ready()
     {
+        CheckPoison();
+        HasTakenFireDamageThisTurn = false;
         Anim.SetInteger("state", 1);
         readied = true;
         TurnManager.NextTurn();
@@ -154,6 +185,8 @@ public class enemyMovement : MonoBehaviour
     }
     void MoveRight()
     {
+        CheckPoison();
+        HasTakenFireDamageThisTurn = false;
         TurnManager.occupied[TilePos + TurnManager.radius] = false;
         TurnManager.occupied[TilePos + TurnManager.radius + 1] = true;
         TilePos++;
@@ -162,6 +195,8 @@ public class enemyMovement : MonoBehaviour
     }
     void MoveLeft()
     {
+        CheckPoison();
+        HasTakenFireDamageThisTurn = false;
         TurnManager.occupied[TilePos + TurnManager.radius] = false;
         TurnManager.occupied[TilePos + TurnManager.radius - 1] = true;
         TilePos--;
@@ -171,7 +206,8 @@ public class enemyMovement : MonoBehaviour
 
     void Flip()
     {
-        
+        CheckPoison();
+        HasTakenFireDamageThisTurn = false;
         charged = false;
         transform.localScale = new Vector3(transform.localScale.x * -1, transform.localScale.y, transform.localScale.z);
         if(transform.localScale.x > 0)
@@ -187,6 +223,8 @@ public class enemyMovement : MonoBehaviour
 
     void Wait()
     {
+        HasTakenFireDamageThisTurn = false;
+        CheckPoison();
         TurnManager.NextTurn();
         charged = true;
     }
