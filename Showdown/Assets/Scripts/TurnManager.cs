@@ -38,7 +38,7 @@ public class TurnManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        turn = turn % entities;
             for (int i = 0; i < onFire.Length; i++)
             {
                 if (onFire[i])
